@@ -65,6 +65,9 @@
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QLabel" name="label">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="font">
         <font>
          <pointsize>12</pointsize>
@@ -77,6 +80,9 @@
      </item>
      <item>
       <widget class="QLabel" name="_labelPassword">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="font">
         <font>
          <pointsize>12</pointsize>
@@ -89,6 +95,9 @@
      </item>
      <item>
       <widget class="QLabel" name="label_4">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="font">
         <font>
          <pointsize>12</pointsize>
@@ -104,6 +113,9 @@
      </item>
      <item>
       <widget class="QLabel" name="_labelAuthKey">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="font">
         <font>
          <pointsize>12</pointsize>
