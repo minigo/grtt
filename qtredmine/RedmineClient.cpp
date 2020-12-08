@@ -504,13 +504,9 @@ RedmineClient::retrieveEnumerations( const QString& enumeration, JsonCb callback
 }
 
 void
-RedmineClient::retrieveIssues( JsonCb callback, const QString& parameters )
+RedmineClient::retrieveIssues (JsonCb callback, const QString& parameters)
 {
-    ENTER()(parameters);
-
-    sendRequest( "issues", callback, QNetworkAccessManager::GetOperation, parameters );
-
-    RETURN();
+    sendRequest ("issues", callback, QNetworkAccessManager::GetOperation, parameters);
 }
 
 void

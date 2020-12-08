@@ -3,27 +3,35 @@
 
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QVBoxLayout>
+#include "ProjectWidget.h"
 
 namespace Ui {
     class ProjectListWidget;
 }
 
-class Widget : public QWidget
+//!
+//! \brief The WidgetScroll class
+//!
+class WidgetScroll : public QWidget
 {
     Q_OBJECT
-public:
-    Widget (QWidget *parent = nullptr)
-        : QWidget (parent)
-    {
-        _vl = new QVBoxLayout (this);
-        _vl->setContentsMargins (0, 0, 0, 0);
-        _vl->setSpacing (0);
-        setLayout (_vl);
-    }
 
+public:
+    WidgetScroll (QWidget *parent = nullptr);
+    virtual ~WidgetScroll ();
+
+public slots:
+    void addProjectWidget (ProjectWidget *wid);
+    void removeAllProjectWidgets ();
+    void slotFiltered (const QString &text);
+
+protected:
     QVBoxLayout *_vl {nullptr};
 };
 
+//!
+//! \brief The ProjectListWidget class
+//!
 class ProjectListWidget : public QWidget
 {
     Q_OBJECT
@@ -32,12 +40,15 @@ public:
     explicit ProjectListWidget (QWidget *parent = nullptr);
     virtual ~ProjectListWidget ();
 
+signals:
+    void signalSelected (int id);
+
 protected slots:
-    void slotInit ();
+    void slotReload ();
 
 private:
     Ui::ProjectListWidget *ui {nullptr};
-    Widget *_w {nullptr};
+    WidgetScroll *_w {nullptr};
 
 };
 

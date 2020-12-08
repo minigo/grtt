@@ -8,6 +8,7 @@ CONFIG += c++11
 
 SOURCES += \
     AuthWidget.cpp \
+    IssuesWidget.cpp \
     MainDialog.cpp \
     ProjectListWidget.cpp \
     ProjectWidget.cpp \
@@ -20,6 +21,7 @@ SOURCES += \
 
 HEADERS += \
     AuthWidget.h \
+    IssuesWidget.h \
     MainDialog.h \
     ProjectListWidget.h \
     ProjectWidget.h \
@@ -33,6 +35,7 @@ HEADERS += \
 
 FORMS += \
     AuthWidget.ui \
+    IssuesWidget.ui \
     MainDialog.ui \
     ProjectListWidget.ui \
     ProjectWidget.ui

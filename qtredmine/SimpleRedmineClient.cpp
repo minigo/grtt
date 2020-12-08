@@ -56,11 +56,10 @@ SimpleRedmineClient::SimpleRedmineClient( QObject* parent )
     _instance = this;
 }
 
-SimpleRedmineClient::SimpleRedmineClient( QString url, QObject* parent )
-    : RedmineClient( url, parent )
+SimpleRedmineClient::SimpleRedmineClient (const QString &url, QObject* parent )
+    : RedmineClient (url, parent)
 {
-    ENTER()(url);
-    init();
+    init ();
     _instance = this;
 }
 
@@ -91,7 +90,7 @@ SimpleRedmineClient::init()
 {
     ENTER();
 
-    checkingConnection_ = false;
+    _checkingConnection = false;
 
     // Connect the network accessible signal to the isConnected slot
     connect( this, &RedmineClient::networkAccessibleChanged,
@@ -106,12 +105,12 @@ SimpleRedmineClient::init()
 void
 SimpleRedmineClient::checkConnectionStatus()
 {
-    ENTER()(checkingConnection_)(connected_);
+    ENTER()(_checkingConnection)(connected_);
 
-    if( checkingConnection_ )
+    if( _checkingConnection )
         RETURN();
 
-    checkingConnection_ = true;
+    _checkingConnection = true;
 
     auto setConnectionState = [=]( QNetworkAccessManager::NetworkAccessibility connected )
     {
@@ -124,7 +123,7 @@ SimpleRedmineClient::checkConnectionStatus()
         }
 
         connected_ = connected;
-        checkingConnection_ = false;
+        _checkingConnection = false;
 
         RETURN();
     };
@@ -150,10 +149,10 @@ SimpleRedmineClient::checkConnectionStatus()
 
     if( reply )
         QTimer::singleShot( 1000, [=](){
-            if( !checkingConnection_ )
+            if( !_checkingConnection )
                 RETURN();
 
-            checkingConnection_ = false;
+            _checkingConnection = false;
             checkConnectionStatus();
         } );
     else
@@ -615,8 +614,7 @@ parseIssue( Issue& issue, QJsonObject* obj )
     RETURN();
   }
 
-void
-SimpleRedmineClient::retrieveIssue( IssueCb callback, int issueId, QString parameters )
+void SimpleRedmineClient::retrieveIssue (IssueCb callback, int issueId, QString parameters)
 {
     ENTER()(issueId)(parameters);
 
@@ -645,11 +643,8 @@ SimpleRedmineClient::retrieveIssue( IssueCb callback, int issueId, QString param
     RETURN();
 }
 
-void
-SimpleRedmineClient::retrieveIssues( IssuesCb callback, RedmineOptions options )
+void SimpleRedmineClient::retrieveIssues (IssuesCb callback, RedmineOptions options)
 {
-    ENTER()(options);
-
     struct Data
     {
         Issues issues;
@@ -657,65 +652,55 @@ SimpleRedmineClient::retrieveIssues( IssuesCb callback, RedmineOptions options )
         JsonCb jsonCb;
     };
 
-    Data* data = new Data();
+    Data* data = new Data ();
 
-    data->jsonCb = [=]( QNetworkReply* reply, QJsonDocument* json )
+    data->jsonCb = [=](QNetworkReply *reply, QJsonDocument *json)
     {
-        ENTER()(json->toJson());
-
         Issues& issues = data->issues;
         int&    offset = data->offset;
         JsonCb& cb     = data->jsonCb;
 
-        // Quit on network error
-        if( reply->error() != QNetworkReply::NoError )
-        {
-            DEBUG() << "Network error:" << reply->errorString();
-            callback( Issues(), RedmineError::ERR_NETWORK, getErrorList(reply, json) );
-            RETURN();
+        //-- Quit on network error
+        if (reply->error() != QNetworkReply::NoError) {
+            qDebug () << "[SimpleRedmineClient][retrieveIssues] Network error:"
+                      << reply->errorString();
+            callback (Issues (), RedmineError::ERR_NETWORK, getErrorList (reply, json));
+            return;
         }
 
         int count = 0;
 
         // Iterate over the document
-        for( const auto& j1 : json->object() )
+        for (const auto& j1 : json->object ())
         {
             // Iterate over all issues
-            for( const auto& j2 : j1.toArray() )
+            for (const auto& j2 : j1.toArray ())
             {
                 Issue issue;
-                QJsonObject obj = j2.toObject();
-                parseIssue( issue, &obj );
-                issues.push_back( issue );
+                QJsonObject obj = j2.toObject ();
+                parseIssue (issue, &obj);
+                issues.push_back (issue);
                 ++count;
                 ++offset;
             }
         }
 
-        if( options.getAllItems && count == limit_ )
+        if (options.getAllItems && count == _limit)
         {
             // In the last run, as many issues as the limit is were found - so there might be more
-            RedmineClient::retrieveIssues(
-                        cb,
-                        QString("%1&offset=%2&limit=%3")
-                            .arg(options.parameters)
-                            .arg(offset)
-                            .arg(limit_) );
+            RedmineClient::retrieveIssues (cb,
+                        QString ("%1&offset=%2&limit=%3").arg (options.parameters, offset, _limit));
         }
         else
         {
             // No more issues to fetch
-            callback( issues, RedmineError::NO_ERR, QStringList() );
+            callback (issues, RedmineError::NO_ERR, QStringList ());
             delete data;
         }
-
-        RETURN();
     };
 
-    RedmineClient::retrieveIssues( data->jsonCb,
-                                   QString("%1&offset=%2&limit=%3").arg(options.parameters).arg(0).arg(limit_) );
-
-    RETURN();
+    RedmineClient::retrieveIssues (data->jsonCb,
+                                   QString ("%1&offset=%2&limit=%3").arg (options.parameters).arg (0).arg (_limit) );
 }
 
 void

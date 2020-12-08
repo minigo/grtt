@@ -18,6 +18,14 @@ public:
     explicit ProjectWidget (const Project &project, QWidget *parent = nullptr);
     virtual ~ProjectWidget ();
 
+    QString name () const;
+
+signals:
+    void signalSelected (int id);
+
+protected:
+    void mouseReleaseEvent (QMouseEvent *event) override;
+
 private:
     Ui::ProjectWidget *ui {nullptr};
     int _id {-1};

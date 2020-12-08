@@ -20,30 +20,27 @@ MainDialog::MainDialog (QWidget *parent)
         _authWidget = nullptr;
 
         _projectsWidget = new ProjectListWidget (this);
+        connect (_projectsWidget, &ProjectListWidget::signalSelected,
+                 this, &MainDialog::slotProjectSelected);
         layout ()->addWidget (_projectsWidget);
 
     });
     ml->addWidget (_authWidget);
-
-    //    _redmine = new SimpleRedmineClient ("http://192.168.88.186", "250dd4902e347cc4c9b549b3930d7253b3d789c5", false);
-    //    _redmine->setAuthenticator ("user", "Windfr0m@ss");
-
-    //    _redmine->retrieveProjects ([]( Projects projects, RedmineError redmineError, QStringList errors)
-    //        {
-    //        if (redmineError != RedmineError::NO_ERR)
-    //        {
-    //            qDebug () << errors;
-    //            return;
-    //        }
-
-    //        for(const auto& project : projects)
-    //            qDebug () << project._name;
-
-    //        } );
 }
 
 MainDialog::~MainDialog()
 {
     //delete ui;
+}
+
+void MainDialog::slotProjectSelected (int id)
+{
+    if (_projectsWidget) {
+        delete _projectsWidget;
+        _projectsWidget = nullptr;
+    }
+
+    _issuesWidget = new IssuesWidget (id, this);
+    layout ()->addWidget (_issuesWidget);
 }
 
